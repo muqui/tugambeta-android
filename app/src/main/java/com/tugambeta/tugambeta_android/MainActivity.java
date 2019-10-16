@@ -1,5 +1,6 @@
 package com.tugambeta.tugambeta_android;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tugambeta.model.Jugador;
+import com.tugambeta.model.Partidos;
 import com.tugambeta.model.Users;
 
 import org.springframework.http.HttpAuthentication;
@@ -27,14 +29,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+
     private Button buttonLogin;
+    List<Partidos> partidos;
     private EditText editTextUser, editTextPassword;
     private TextView textViewRegistro;
     String username;
     String password;
     String getUrl;
-    Users user;
+    Users user = null;
+    ProgressDialog pd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().hide(); // hide the title bar
         //this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN); //enable full screen
         setContentView(R.layout.activity_main);
+         pd = new ProgressDialog(MainActivity.this);
         buttonLogin = (Button) findViewById(R.id.buttonLogin);
         buttonLogin.setOnClickListener(this);
         editTextUser = (EditText) findViewById(R.id.editTextUsuario);
@@ -54,66 +64,82 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()){
             case R.id.buttonLogin:
                 super.onStart();
+                pd.setMessage("loading");
+                pd.show();
                 new MainActivity.HttpRequestTask(this).execute();
                 break;
         }
     }
-    public class HttpRequestTask extends AsyncTask<Void, Void, Users> {
+    public class HttpRequestTask extends AsyncTask<Void, Void, List<Partidos>> {
         private Context mContext;
 
         HttpStatus statusCode;
-        public HttpRequestTask(Context context){ // este constructor permite usar un Toast
+
+        public HttpRequestTask(Context context) { // este constructor permite usar un Toast
             mContext = context;
         }
 
+
         @Override
-        protected   Users doInBackground(Void... params) {
+        protected List<Partidos> doInBackground(Void... params) {
+
             try {
-                 username = editTextUser.getText().toString();
-                 password = editTextPassword.getText().toString();
-                HttpAuthentication authHeader = new HttpBasicAuthentication(username,password);
+
+                String username = "ligamx";
+                String password = "12345678";
+                HttpAuthentication authHeader = new HttpBasicAuthentication(username, password);
                 HttpHeaders requestHeaders = new HttpHeaders();
                 requestHeaders.setAuthorization(authHeader);
                 HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-                // getUrl = "http://192.168.1.68:8080/rest/user/"+ username;
-                 getUrl = "https://tugambeta.herokuapp.com/rest/user/" + username;
-
-                ResponseEntity<Users> entity = restTemplate.exchange(getUrl, HttpMethod.GET, requestEntity, Users.class);
+                String getUrl = "http://tugambeta-rest.herokuapp.com/grupo/partidos/"+ username;
+               // getUrl = "https://tugambeta.herokuapp.com/rest/partidos/" + username;
+                ResponseEntity<Partidos[]> entity = restTemplate.exchange(getUrl, HttpMethod.GET, requestEntity, Partidos[].class);
                 statusCode = entity.getStatusCode();
-                user = entity.getBody();
+                partidos = Arrays.asList(entity.getBody());
 
-                Log.d("esttus " , "resul_string"+ statusCode.toString());
-                return user;
+                return partidos;
             } catch (Exception e) {
-
-                Log.e("alberto2 ", "error: " + e);
+                Log.e("MainActivity", e.getMessage(), e);
             }
 
-            return user;
+            return null;
         }
-        @Override
-        protected void onPostExecute(   Users user) {
 
-            if(user != null){
-                Log.d("minombre" , "usuario roles " + user.getUserRoleses().toString());
+        @Override
+        protected void onPostExecute(List<Partidos> partidos) {
+
+            if(partidos != null){
+                for (int i = 0; i < partidos.size(); i++) {
+                    Partidos p = partidos.get(i);
+
+                   Log.i("coron1", p.getQuiniela().getIdquiniela().toString() + "id partido ");
+                }
+
                 game();
             }
             else
-               mostrar();
+
+                mostrar();
+
+
 
         }
-
     }
 
     private void mostrar() {
         Toast.makeText(MainActivity.this, "mensaje: " + getUrl, Toast.LENGTH_LONG).show();
     }
     private void game() {
+        FragmentJugar fragmentJugar = new FragmentJugar();
         Intent i = new Intent(this, JugadorActivity.class);
-        i.putExtra("user", user);
+        i.putExtra("partidos", (Serializable) partidos);
         startActivity(i);
     }
+
+
+
+
 
 }

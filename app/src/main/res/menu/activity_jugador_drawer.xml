@@ -12,10 +12,7 @@
             android:id="@+id/nav_participantes"
 
             android:title="Participantes" />
-        <item
-            android:id="@+id/nav_historial"
 
-            android:title="Historia" />
         <item
             android:id="@+id/nav_salir"
 

@@ -4,12 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".FragmentParticipantes">
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
 
-    <!-- TODO: Update blank fragment layout -->
-
-    <Button
-        android:id="@+id/button2"
+    <LinearLayout
+        android:id="@+id/linearParticipantes"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Fragment Participantes" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"></LinearLayout>
+
+    </ScrollView>
 </FrameLayout>
+

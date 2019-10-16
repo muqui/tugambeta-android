@@ -35,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +49,7 @@ public class JugadorActivity extends AppCompatActivity
     RadioGroup radioGroup;
     RadioButton radioButton;
     LinearLayout linearMain;
+    List<Partidos> partidos;
     List<RadioGroup> listRadioGroup = new ArrayList<RadioGroup>();
     String getUrl;
     @Override
@@ -57,16 +59,21 @@ public class JugadorActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        linearMain = (LinearLayout)findViewById(R.id.linearMain);
+
 
 
         //datos recibidos del MainActivity.
         Bundle bundle = getIntent().getExtras();
-        user = (Users) bundle.getSerializable("user");
-        Log.i("user", user.toString());
+        partidos = (List<Partidos>) bundle.getSerializable("partidos");
+
+//        user = (Users) bundle.getSerializable("user");
+        Log.i("userx", partidos.get(0).getQuiniela().getNombre());
 
         //insertar fragment
         Fragment fragment = new FragmentJugar();
+        Bundle bundleFragment = new Bundle();
+        bundleFragment.putSerializable("partidos", (Serializable)partidos);
+        fragment.setArguments(bundleFragment);
         getSupportFragmentManager().beginTransaction().replace(R.id.content_jugador,fragment).commit();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -126,15 +133,16 @@ public class JugadorActivity extends AppCompatActivity
         Fragment fragment = null;
         if (id == R.id.nav_jugar) {
             fragment = new FragmentJugar();
+            Bundle bundleFragment = new Bundle();
+            bundleFragment.putSerializable("partidos", (Serializable)partidos);
+            fragment.setArguments(bundleFragment);
             fragmentTransaction = true;
         } else if (id == R.id.nav_participantes) {
             fragment = new FragmentParticipantes();
             fragmentTransaction = true;
 
-        } else if (id == R.id.nav_historial) {
-
         } else if (id == R.id.nav_salir) {
-
+            System.exit(0);
         }
         if(fragmentTransaction){
             getSupportFragmentManager().beginTransaction().replace(R.id.content_jugador,fragment).commit();

@@ -15,7 +15,7 @@ public class Partidos implements java.io.Serializable {
     private String local;
     private String visitante;
     private Integer goleslocal;
-    private int golesvisita;
+    private Integer golesvisita;
     private Set<Jugadorresultados> jugadorresultadoses = new HashSet<Jugadorresultados>(0);
 
     public Partidos() {
@@ -95,11 +95,11 @@ public class Partidos implements java.io.Serializable {
         this.goleslocal = goleslocal;
     }
 
-    public int getGolesvisita() {
+    public Integer getGolesvisita() {
         return this.golesvisita;
     }
 
-    public void setGolesvisita(int golesvisita) {
+    public void setGolesvisita(Integer golesvisita) {
         this.golesvisita = golesvisita;
     }
 
